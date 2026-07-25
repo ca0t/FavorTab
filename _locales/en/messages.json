@@ -1,0 +1,8 @@
+{
+  "extName": {
+    "message": "FavorTab"
+  },
+  "extDescription": {
+    "message": "🎨 A minimalist, beautiful new tab page extension that perfectly replaces your browser's default new tab. All data stays local — zero privacy risk.\n\n✨ Key Features:\n\n• 🖼 Bing Daily Wallpaper — Auto-fetches Bing's HD daily image with fade-in animation and copyright info; supports custom background uploads with easy reset to Bing\n• 🔍 Multi-Engine Search — 6 search engines built in: Google, Baidu, Bing, Sogou, 360 Search, DuckDuckGo. Quick-switch via top-left dropdown. Press Enter to search\n• 📁 Bookmark Card Grid — Intelligently reads Chrome/Edge bookmarks and renders them as large beautiful cards organized by folder hierarchy\n• 🗂 Folder Collapse/Expand — Click any folder name to collapse or expand; state persists automatically\n• ✏️ Inline Folder Rename — Click the edit icon to rename folders in-place. Enter to save, Escape to cancel\n• ❌ Bookmark Deletion — Hover over any bookmark card to reveal the delete button; removes directly from browser bookmarks after confirmation\n• 🖌 Customizable Glass Effect — Settings panel (top-right) lets you independently adjust blur and opacity for 3 UI areas: top buttons, search box, and bookmark container. CSS variables update in real-time\n• ⚡ Offline/Instant Experience — Bing wallpapers are cached to localStorage for zero network wait on subsequent opens; custom backgrounds persist too\n• 🌐 Smart Favicon Loading — Uses Cravatar CDN (accessible inside China) for website icons, converts to base64 via Canvas for local caching. Icons appear instantly even after browser restart\n• 🔢 Click Tracking — Automatically counts clicks per bookmark (ready for sorting and future enhancements)"
+  }
+}

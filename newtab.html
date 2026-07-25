@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FavorTab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="bg-layer"></div>
+  <div id="bg-copyright" style="display:none"></div>
+  <div class="overlay"></div>
+
+  <!-- 右上角按钮组 -->
+  <div class="top-controls">
+    <button id="settings-btn" class="top-btn" title="设置">⚙ 设置</button>
+
+    <!-- 设置弹窗 -->
+    <div id="settings-modal" class="dropdown-modal" style="display:none">
+      <div class="dropdown-panel settings-panel">
+
+        <!-- 背景管理 -->
+        <div class="setting-group">
+          <div class="setting-label">背景</div>
+          <div class="bg-preview" id="bg-preview">
+            <div class="bg-preview-label">当前背景</div>
+            <button id="bg-upload-btn" class="bg-upload-btn" title="上传新背景">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </button>
+          </div>
+          <input type="file" id="bg-file-input" accept="image/*" style="display:none">
+          <button id="bg-reset-btn" class="panel-btn">重置为 Bing 每日一图</button>
+        </div>
+
+        <!-- 右上角按钮 -->
+        <div class="setting-group">
+          <div class="setting-label">按钮</div>
+          <div class="setting-row">
+            <span class="setting-key">模糊度</span>
+            <input type="range" class="setting-range" min="0" max="30" value="10" step="1" data-key="btnBlur">
+            <span class="setting-val">10px</span>
+          </div>
+          <div class="setting-row">
+            <span class="setting-key">透明度</span>
+            <input type="range" class="setting-range" min="0" max="100" value="8" step="1" data-key="btnOpacity">
+            <span class="setting-val">8%</span>
+          </div>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="setting-group">
+          <div class="setting-label">搜索框</div>
+          <div class="setting-row">
+            <span class="setting-key">模糊度</span>
+            <input type="range" class="setting-range" min="0" max="40" value="24" step="1" data-key="searchBlur">
+            <span class="setting-val">24px</span>
+          </div>
+          <div class="setting-row">
+            <span class="setting-key">透明度</span>
+            <input type="range" class="setting-range" min="0" max="100" value="12" step="1" data-key="searchOpacity">
+            <span class="setting-val">12%</span>
+          </div>
+        </div>
+
+        <!-- 收藏夹遮罩 -->
+        <div class="setting-group">
+          <div class="setting-label">收藏夹</div>
+          <div class="setting-row">
+            <span class="setting-key">模糊度</span>
+            <input type="range" class="setting-range" min="0" max="40" value="18" step="1" data-key="bmBlur">
+            <span class="setting-val">18px</span>
+          </div>
+          <div class="setting-row">
+            <span class="setting-key">透明度</span>
+            <input type="range" class="setting-range" min="0" max="100" value="38" step="1" data-key="bmOpacity">
+            <span class="setting-val">38%</span>
+          </div>
+        </div>
+
+        <!-- 重置 -->
+        <button id="settings-reset-btn" class="panel-btn">恢复默认设置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 左上角搜索引擎选择 -->
+  <div class="engine-picker">
+    <select id="engine-select" class="engine-select">
+      <!-- JS 动态填充 -->
+    </select>
+  </div>
+
+  <div class="container">
+    <div class="search-section">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="search-input" type="text" placeholder="搜索" autofocus autocomplete="off">
+        <button id="search-btn" class="search-btn" title="搜索">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="bookmarks-container" class="bookmarks-container"></div>
+  </div>
+
+  <script src="newtab.js"></script>
+</body>
+</html>
