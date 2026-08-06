@@ -3,6 +3,6 @@
     "message": "FavorTab"
   },
   "extDescription": {
-    "message": "A minimalist new tab page with Bing daily wallpaper, multi-engine search, bookmark card grid and drag sorting. All data stays local — zero privacy risk."
+    "message": "A minimalist new tab page that replaces your browser default. All data stays local — zero privacy risk.\n\nKey features:\n· Bing daily wallpaper: HD image with fade-in animation and copyright info, custom background upload, reset to Bing\n· Multi-engine search: Google, Baidu, Bing, Sogou, 360, DuckDuckGo, quick switch via dropdown, Enter to search\n· Bookmark card grid: renders Chrome/Edge bookmarks as large cards by folder, with collapse/expand, rename and delete\n· Drag sorting: reorder cards and move across folders, synced with browser bookmarks\n· Customizable glass effect: adjust blur and opacity for buttons, search box and bookmarks, real-time\n· Offline instant: wallpapers and favicons cached locally, zero network wait on next open"
   }
 }
