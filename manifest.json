@@ -7,7 +7,7 @@
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
-  "permissions": ["bookmarks"],
+  "permissions": ["bookmarks", "favicon"],
   "host_permissions": [
     "https://www.bing.com/*"
   ],

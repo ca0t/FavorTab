@@ -437,8 +437,9 @@ function setFaviconCache(cache) {
  *
  * 优先级：
  *  1. localStorage base64 缓存（最快速，零网络）
- *  2. Google favicon 服务（最可靠，覆盖几乎所有域名）
- *  3. 兜底：默认地球仪 SVG
+ *  2. 浏览器自身 favicon 缓存（_favicon/ API，与收藏夹栏显示的图标同源，零网络）
+ *  3. Cravatar CDN 兜底（浏览器未缓存该站点时）
+ *  4. 最终兜底：默认地球仪 SVG（onerror 内逐级回退）
  */
 function getFaviconUrl(url) {
   try {
@@ -446,11 +447,49 @@ function getFaviconUrl(url) {
     const domain = urlObj.hostname;
     const cache = getFaviconCache();
     if (cache[domain]) return cache[domain];
-    // Cravatar 是国内 CDN，比 Google 更快更稳定
+    return getBrowserFaviconUrl(url);
+  } catch {
+    return DEFAULT_ICON;
+  }
+}
+
+/**
+ * 浏览器自身 favicon 缓存 URL（Chrome 88+ / Edge，需 "favicon" 权限）。
+ * 直接读取浏览器已缓存的站点图标，与收藏夹栏显示的图标同源，零网络请求。
+ */
+function getBrowserFaviconUrl(url) {
+  try {
+    return chrome.runtime.getURL('_favicon/') +
+      '?pageUrl=' + encodeURIComponent(url) + '&size=32';
+  } catch {
+    return getCravatarUrl(url);
+  }
+}
+
+/** Cravatar 国内 CDN 兜底 URL */
+function getCravatarUrl(url) {
+  try {
+    const domain = new URL(url).hostname;
     return `https://cravatar.com/favicon/api/index.php?url=${domain}`;
   } catch {
     return DEFAULT_ICON;
   }
+}
+
+/** 图片加载失败时逐级回退：浏览器缓存 → Cravatar → 默认图标 */
+function fallbackFavicon(imgEl) {
+  const src = imgEl.src || '';
+  if (src.includes('/_favicon/')) {
+    // 浏览器未缓存该站点 → 换 Cravatar
+    imgEl.src = getCravatarUrl(imgEl.dataset.domain);
+    return;
+  }
+  if (src.includes('cravatar.com')) {
+    // Cravatar 也失败 → 默认地球仪
+    imgEl.src = DEFAULT_ICON;
+    return;
+  }
+  imgEl.src = DEFAULT_ICON;
 }
 
 /** 加载完成后将跨域 favicon 通过 canvas 转为 base64 缓存到 localStorage */
@@ -514,7 +553,7 @@ function buildBookmarkCard(bm) {
             alt=""
             loading="lazy"
             data-domain="${escapeHtml(bm.url)}"
-            onerror="this.onerror=null;this.src='${DEFAULT_ICON}'"
+            onerror="fallbackFavicon(this)"
             onload="cacheFavicon(this)"
           >
         </div>
