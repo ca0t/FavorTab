@@ -702,6 +702,80 @@ body.sorting .bookmark-card:hover .bookmark-delete-btn {
   opacity: 0.85;
 }
 
+/* 书签重命名编辑按钮（hover 卡片显示，右上角与删除按钮并排） */
+.bookmark-edit-btn {
+  position: absolute;
+  top: 4px;
+  right: 32px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease;
+  color: rgba(255, 255, 255, 0.6);
+  z-index: 2;
+}
+
+.bookmark-card:hover .bookmark-edit-btn {
+  opacity: 1;
+}
+
+.bookmark-edit-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.bookmark-edit-btn svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* 书签内联编辑输入框（编辑态覆盖在卡片名称位置） */
+.bookmark-name-input {
+  display: none;
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 10px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  padding: 3px 6px;
+  outline: none;
+  text-align: center;
+  z-index: 3;
+}
+
+.bookmark-name-input:focus {
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* 编辑状态下隐藏名称文本和编辑按钮，显示输入框 */
+.bookmark-card.editing .bookmark-name-text,
+.bookmark-card.editing .bookmark-edit-btn {
+  display: none;
+}
+
+.bookmark-card.editing .bookmark-name-input {
+  display: block !important; /* 覆盖模板中的内联 display:none */
+}
+
+/* 拖拽中禁用重命名按钮 hover 闪现 */
+body.sorting .bookmark-card:hover .bookmark-edit-btn {
+  opacity: 0;
+}
+
 /* ===== Empty State ===== */
 .empty-state {
   text-align: center;

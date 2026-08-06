@@ -559,8 +559,17 @@ function buildBookmarkCard(bm) {
             onload="cacheFavicon(this)"
           >
         </div>
-        <span class="bookmark-name">${escapeHtml(bm.title || bm.url)}</span>
+        <span class="bookmark-name">
+          <span class="bookmark-name-text">${escapeHtml(bm.title || bm.url)}</span>
+        </span>
       </a>
+      <span class="bookmark-edit-btn" title="重命名" data-id="${bm.id}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+          <path d="m15 5 4 4"/>
+        </svg>
+      </span>
+      <input class="bookmark-name-input" value="${escapeHtml(bm.title || bm.url)}" style="display:none">
       <button class="bookmark-delete-btn" title="删除书签" data-id="${bm.id}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <line x1="18" y1="6" x2="6" y2="18"/>
@@ -802,10 +811,11 @@ function initSortables() {
       ghostClass: 'drag-ghost',      // 拖拽中幽灵卡片样式
       chosenClass: 'drag-chosen',    // 被选中卡片样式
       filter: (evt, el) => {
-        // 编辑模式下禁止拖拽
-        if (container.querySelector('.folder-title.editing')) return true;
-        // 删除按钮不触发拖拽
-        return el.closest('.bookmark-delete-btn');
+        // 编辑模式下禁止拖拽（文件夹或书签名称编辑中）
+        if (container.querySelector('.folder-title.editing') ||
+            container.querySelector('.bookmark-card.editing')) return true;
+        // 删除按钮/重命名按钮不触发拖拽
+        return el.closest('.bookmark-delete-btn') || el.closest('.bookmark-edit-btn');
       },
       preventOnFilter: true,
       onStart: (evt) => {
@@ -982,15 +992,33 @@ function setupBookmarkEvents() {
       return;
     }
 
+    // 重命名编辑按钮（书签卡片）→ 进入编辑模式
+    const bookmarkEditBtn = e.target.closest('.bookmark-edit-btn');
+    if (bookmarkEditBtn) {
+      e.stopPropagation();
+      e.preventDefault();
+      // 先保存当前正在编辑的文件夹或书签（如果有）
+      saveAnyEditing();
+
+      const card = bookmarkEditBtn.closest('.bookmark-card');
+      const inputEl = card.querySelector('.bookmark-name-input');
+      const textEl = card.querySelector('.bookmark-name-text');
+      inputEl.value = textEl.textContent;
+      card.classList.add('editing');
+      inputEl.focus();
+      inputEl.select();
+      return;
+    }
+
+    // 编辑模式下的输入框点击 → 不触发跳转/计数/折叠
+    if (e.target.closest('.bookmark-name-input')) return;
+
     // 重命名编辑按钮 → 进入编辑模式
     const editBtn = e.target.closest('.folder-edit-btn');
     if (editBtn) {
       e.stopPropagation();
-      // 先保存当前正在编辑的文件夹（如果有）
-      const currentEditing = container.querySelector('.folder-title.editing');
-      if (currentEditing && currentEditing !== editBtn.closest('.folder-title')) {
-        saveFolderRename(currentEditing);
-      }
+      // 先保存当前正在编辑的文件夹或书签（如果有）
+      saveAnyEditing();
 
       const title = editBtn.closest('.folder-title');
       const folderId = title.dataset.folderId;
@@ -1035,15 +1063,36 @@ function setupBookmarkEvents() {
 
   // 点击页面空白区域 → 保存并退出编辑
   document.addEventListener('mousedown', (e) => {
+    const editingCard = container.querySelector('.bookmark-card.editing');
+    if (editingCard) {
+      // 点击在编辑区域内 → 不处理
+      if (editingCard.contains(e.target)) return;
+      saveBookmarkRename(editingCard);
+    }
     const editingTitle = container.querySelector('.folder-title.editing');
-    if (!editingTitle) return;
-    // 点击在编辑区域内 → 不处理
-    if (editingTitle.contains(e.target)) return;
-    saveFolderRename(editingTitle);
+    if (editingTitle) {
+      // 点击在编辑区域内 → 不处理
+      if (editingTitle.contains(e.target)) return;
+      saveFolderRename(editingTitle);
+    }
   });
 
   // 重命名输入框：Enter 保存，Escape 取消
   container.addEventListener('keydown', (e) => {
+    // 书签名称输入框
+    const bmInput = e.target.closest('.bookmark-name-input');
+    if (bmInput) {
+      const card = bmInput.closest('.bookmark-card');
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        saveBookmarkRename(card);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        card.classList.remove('editing');
+      }
+      return;
+    }
+    // 文件夹名称输入框
     const input = e.target.closest('.folder-name-input');
     if (!input) return;
     const title = input.closest('.folder-title');
@@ -1057,14 +1106,41 @@ function setupBookmarkEvents() {
     }
   });
 
-  // 保存文件夹重命名
+  // 保存当前正在编辑的文件夹或书签（点击另一个编辑按钮时先落盘）
+  function saveAnyEditing() {
+    const editingCard = container.querySelector('.bookmark-card.editing');
+    if (editingCard) saveBookmarkRename(editingCard);
+    const editingTitle = container.querySelector('.folder-title.editing');
+    if (editingTitle) saveFolderRename(editingTitle);
+  }
+
+  // 保存书签卡片重命名（不 trim：用户输入什么就保存什么，包括空格）
+  function saveBookmarkRename(card) {
+    const bookmarkId = card.dataset.id;
+    const textEl = card.querySelector('.bookmark-name-text');
+    const inputEl = card.querySelector('.bookmark-name-input');
+    const newName = inputEl.value;
+
+    if (newName !== '' && newName !== textEl.textContent) {
+      chrome.bookmarks.update(bookmarkId, { title: newName }, () => {
+        if (chrome.runtime.lastError) {
+          alert('重命名失败：' + chrome.runtime.lastError.message);
+          return;
+        }
+        textEl.textContent = newName;
+      });
+    }
+    card.classList.remove('editing');
+  }
+
+  // 保存文件夹重命名（不 trim：用户输入什么就保存什么，包括空格）
   function saveFolderRename(title) {
     const folderId = title.dataset.folderId;
     const textEl = title.querySelector('.folder-name-text');
     const inputEl = title.querySelector('.folder-name-input');
-    const newName = inputEl.value.trim();
+    const newName = inputEl.value;
 
-    if (newName && newName !== textEl.textContent && folderId !== 'root_uncategorized') {
+    if (newName !== '' && newName !== textEl.textContent && folderId !== 'root_uncategorized') {
       chrome.bookmarks.update(folderId, { title: newName }, () => {
         textEl.textContent = newName;
       });
