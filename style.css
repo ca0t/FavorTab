@@ -566,6 +566,25 @@ body {
 .bookmark-card {
   position: relative;
   border-radius: 12px;
+  cursor: grab;
+}
+
+/* Sortable 拖拽中的幽灵卡片（纯半透明，无白底） */
+.bookmark-card.drag-ghost {
+  opacity: 0.35;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* Sortable 被选中的卡片 */
+.bookmark-card.drag-chosen {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+/* 拖拽目标文件夹高亮（拖到标题/空白区域 → 放第一个位置） */
+.folder-section.drop-target {
+  outline: 2px dashed rgba(255, 255, 255, 0.55);
+  outline-offset: 6px;
+  border-radius: 14px;
 }
 
 .bookmark-link {
@@ -583,6 +602,27 @@ body {
 
 .bookmark-card:hover .bookmark-link {
   background: rgba(255, 255, 255, 0.10);
+}
+
+/* 拖拽期间禁用 hover 发白效果（Sortable 实时移动 DOM，鼠标悬停的卡片会触发 hover） */
+body.sorting .bookmark-card:hover .bookmark-link {
+  background: transparent;
+}
+
+body.sorting .bookmark-card {
+  cursor: grabbing;
+}
+
+/* 拖拽中禁用图标圆圈 hover 效果（缩放 + 背景变亮） */
+body.sorting .bookmark-card:hover .bookmark-icon-circle {
+  background: rgba(255, 255, 255, 0.16);
+  transform: none;
+}
+
+/* 拖拽中禁用删除按钮 hover 闪现 */
+body.sorting .bookmark-card:hover .bookmark-delete-btn {
+  opacity: 0;
+  transform: scale(0.7);
 }
 
 /* 删除按钮 */
