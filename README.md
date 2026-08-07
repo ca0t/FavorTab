@@ -29,6 +29,8 @@
 
 从 Chrome 网上应用店或 Edge 加载项商店搜索 "FavorTab" 安装。
 
+Edge商店：https://microsoftedge.microsoft.com/addons/detail/favortab/dbgblpblaohalmkmdophopgjhacobbmk
+
 ### 开发者模式（手动加载）
 
 1. 克隆仓库
